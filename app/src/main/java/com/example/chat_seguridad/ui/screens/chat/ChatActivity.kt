@@ -12,6 +12,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.example.chat_seguridad.ui.components.MessageCard
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import android.content.Intent
+import androidx.compose.ui.res.vectorResource
+import com.example.chat_seguridad.R
 
 class ChatActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,37 +31,53 @@ class ChatActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatScreen() {
-    // Inicializa con un mensaje de ejemplo como mensaje entrante
     var messages by remember { mutableStateOf(listOf(Triple("Other User", "Hola, ¿cómo estás?", true))) }
     var textState by remember { mutableStateOf(TextFieldValue("")) }
 
-    Column(modifier = Modifier.fillMaxSize().padding(8.dp)) {
-        // Lista de mensajes
-        LazyColumn(modifier = Modifier.weight(1f)) {
-            items(messages) { triple ->
-                // Usa el parámetro isIncoming para alinear los mensajes
-                MessageCard(userName = triple.first, message = triple.second, isIncoming = triple.third)
-            }
-        }
-
-        // Campo de texto y botón de envío
-        Row(modifier = Modifier.padding(8.dp)) {
-            OutlinedTextField(
-                value = textState,
-                onValueChange = { textState = it },
-                modifier = Modifier.weight(1f),
-                placeholder = { Text("Escribe un mensaje") }
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            // Cuando agregues un mensaje, asegúrate de especificar si es entrante o saliente
-            Button(onClick = {
-                if (textState.text.isNotEmpty()) {
-                    // Aquí asumo que los mensajes enviados no son entrantes, por lo tanto, el booleano es 'false'
-                    messages = messages + Triple("User Name", textState.text, false)
-                    textState = TextFieldValue("")
+    Scaffold(
+        topBar = {
+            SmallTopAppBar(
+                title = { Text("Chat") },
+                actions = {
+                    // Botón de cerrar sesión
+                    IconButton(onClick = { /* TODO: Acción para cerrar sesión */ }) {
+                        Icon(
+                            imageVector = ImageVector.vectorResource(id = R.drawable.ic_logout), // Reemplaza ic_logout con tu icono de cerrar sesión
+                            contentDescription = "Cerrar Sesión"
+                        )
+                    }
                 }
-            }) {
-                Text("Enviar")
+            )
+        }
+    ) { innerPadding ->
+        Column(modifier = Modifier
+            .fillMaxSize()
+            .padding(innerPadding)
+            .padding(8.dp)) {
+            // Lista de mensajes
+            LazyColumn(modifier = Modifier.weight(1f)) {
+                items(messages) { triple ->
+                    MessageCard(userName = triple.first, message = triple.second, isIncoming = triple.third)
+                }
+            }
+
+            // Campo de texto y botón de envío
+            Row(modifier = Modifier.padding(8.dp)) {
+                OutlinedTextField(
+                    value = textState,
+                    onValueChange = { textState = it },
+                    modifier = Modifier.weight(1f),
+                    placeholder = { Text("Escribe un mensaje") }
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Button(onClick = {
+                    if (textState.text.isNotEmpty()) {
+                        messages = messages + Triple("User Name", textState.text, false)
+                        textState = TextFieldValue("")
+                    }
+                }) {
+                    Text("Enviar")
+                }
             }
         }
     }
